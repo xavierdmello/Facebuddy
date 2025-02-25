@@ -135,27 +135,27 @@ export default function FaceRecognition({ savedFaces }: Props) {
   }, [selectedFaceIndex, detectedFaces]);
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-4 w-full">
       <h2 className="text-xl font-bold">Recognize Faces</h2>
       
-      <div className="flex w-full max-w-[900px] gap-4">
-        {/* Left side: Image upload and preview */}
-        <div className="flex-1">
+      <div className="flex flex-col md:flex-row w-full max-w-[900px] gap-4">
+        {/* Left/Top side: Image upload and preview */}
+        <div className="flex-1 w-full md:w-auto">
           <input
             type="file"
             accept="image/*"
             onChange={handleImageUpload}
-            className="mb-4"
+            className="mb-4 w-full"
           />
           
-          <div className="relative inline-block">
+          <div className="relative inline-block w-full">
             {selectedImage && (
               <>
                 <img
                   ref={imageRef}
                   src={selectedImage}
                   alt="Selected"
-                  className="max-w-[450px] rounded-xl"
+                  className="w-full md:max-w-[450px] rounded-xl"
                   onLoad={detectFaces}
                 />
                 <canvas
@@ -167,17 +167,17 @@ export default function FaceRecognition({ savedFaces }: Props) {
           </div>
         </div>
 
-        {/* Right side: Face selection and details */}
+        {/* Right/Bottom side: Face selection and details */}
         {detectedFaces.length > 0 && (
-          <div className="flex flex-col gap-4 min-w-[300px]">
-            <div className="border rounded-lg p-4 bg-white">
+          <div className="flex flex-col gap-4 w-full md:w-[300px]">
+            <div className="border rounded-lg p-4 bg-white shadow-sm">
               <h3 className="text-sm font-semibold mb-2">Detected Faces</h3>
               <div className="flex flex-col gap-2">
                 {detectedFaces.map((face, index) => face.match.label != "unknown" && (
                   <button
                     key={index}
                     onClick={() => setSelectedFaceIndex(index)}
-                    className={`px-3 py-2 rounded text-left ${
+                    className={`px-3 py-2 rounded text-left w-full ${
                       selectedFaceIndex === index
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-100 hover:bg-gray-200'
@@ -190,35 +190,43 @@ export default function FaceRecognition({ savedFaces }: Props) {
             </div>
 
             {selectedFaceIndex !== null && detectedFaces[selectedFaceIndex].matchedProfile && (
-              <div className="border rounded-lg p-4 bg-white">
+              <div className="border rounded-lg p-4 bg-white shadow-sm">
                 <h3 className="text-sm font-semibold mb-2">Profile Details</h3>
                 <div className="flex flex-col gap-2">
-                  <p><strong>Name:</strong> {detectedFaces[selectedFaceIndex].matchedProfile!.name}</p>
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <p><strong>Name:</strong> {detectedFaces[selectedFaceIndex].matchedProfile!.name}</p>
+                  </div>
+                  
                   {detectedFaces[selectedFaceIndex].matchedProfile!.linkedin && (
-                    <p>
-                      <strong>LinkedIn:</strong>{' '}
-                      <a 
-                        href={`https://linkedin.com/in/${detectedFaces[selectedFaceIndex].matchedProfile!.linkedin}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 hover:underline"
-                      >
-                        {detectedFaces[selectedFaceIndex].matchedProfile!.linkedin}
-                      </a>
-                    </p>
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <p>
+                        <strong>LinkedIn:</strong>{' '}
+                        <a 
+                          href={`https://linkedin.com/in/${detectedFaces[selectedFaceIndex].matchedProfile!.linkedin}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 hover:underline break-all"
+                        >
+                          {detectedFaces[selectedFaceIndex].matchedProfile!.linkedin}
+                        </a>
+                      </p>
+                    </div>
                   )}
+                  
                   {detectedFaces[selectedFaceIndex].matchedProfile!.telegram && (
-                    <p>
-                      <strong>Telegram:</strong>{' '}
-                      <a 
-                        href={`https://t.me/${detectedFaces[selectedFaceIndex].matchedProfile!.telegram}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 hover:underline"
-                      >
-                        @{detectedFaces[selectedFaceIndex].matchedProfile!.telegram}
-                      </a>
-                    </p>
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <p>
+                        <strong>Telegram:</strong>{' '}
+                        <a 
+                          href={`https://t.me/${detectedFaces[selectedFaceIndex].matchedProfile!.telegram}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 hover:underline break-all"
+                        >
+                          @{detectedFaces[selectedFaceIndex].matchedProfile!.telegram}
+                        </a>
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>
