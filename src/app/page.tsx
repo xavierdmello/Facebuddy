@@ -42,7 +42,7 @@ export default function Page() {
         {address ? (
           <>
             <FaceDetection />
-            <TransactionWrapper address={address} />
+            {/* <TransactionWrapper address={address} /> */}
           </>
         ) : (
           <WalletWrapper
