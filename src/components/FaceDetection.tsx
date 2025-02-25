@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 
 import * as faceapi from 'face-api.js';
 
@@ -38,26 +38,34 @@ export default function FaceDetection() {
   const detectFaces = async () => {
     if (!imageRef.current || !canvasRef.current || !isModelLoaded) return;
 
-    // Set canvas dimensions to match image
-    canvasRef.current.width = imageRef.current.width;
-    canvasRef.current.height = imageRef.current.height;
+    // Match canvas dimensions to displayed image size
+    const displaySize = {
+      width: imageRef.current.clientWidth,
+      height: imageRef.current.clientHeight
+    };
+
+    // Set canvas size to match the display size
+    faceapi.matchDimensions(canvasRef.current, displaySize);
 
     // Detect faces
     const detections = await faceapi
       .detectAllFaces(imageRef.current, new faceapi.TinyFaceDetectorOptions())
       .withFaceLandmarks();
 
-    console.log(detections)
+    // Resize the detections to match display size
+    const resizedDetections = faceapi.resizeResults(detections, displaySize);
 
-    // Draw results
+    console.log(resizedDetections)
+    // Clear previous drawings
     const ctx = canvasRef.current.getContext('2d');
     if (ctx) {
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       
-      detections.forEach(detection => {
-        const box = detection.detection.box;
-        const drawBox = new faceapi.draw.DrawBox(box, { 
-          label: 'Face' 
+      // Draw each detection
+      resizedDetections.forEach(detection => {
+        const drawBox = new faceapi.draw.DrawBox(detection.detection.box, { 
+          label: 'Face',
+          boxColor: '#00ff00' // Make the box more visible
         });
         drawBox.draw(canvasRef.current!);
       });
@@ -73,7 +81,7 @@ export default function FaceDetection() {
         className="mb-4"
       />
       
-      <div className="relative">
+      <div className="relative inline-block">
         {selectedImage && (
           <>
             <img
@@ -85,7 +93,7 @@ export default function FaceDetection() {
             />
             <canvas
               ref={canvasRef}
-              className="absolute top-0 left-0"
+              className="absolute top-0 left-0 z-10"
             />
           </>
         )}
