@@ -4,6 +4,8 @@ import * as faceapi from 'face-api.js';
 
 import { useEffect, useRef, useState } from 'react';
 
+import { useAccount } from "wagmi";
+
 export interface ProfileData {
   name: string;
   linkedin?: string;
@@ -28,17 +30,26 @@ interface Props {
 }
 
 export default function FaceRegistration({ onFaceSaved, savedFaces }: Props) {
+    const { address } = useAccount();
+
   const imageRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [profile, setProfile] = useState<ProfileData>({
-    name: '',
+    name: address ?? '',
     linkedin: '',
     telegram: ''
   });
+  
   const [detectedFaces, setDetectedFaces] = useState<DetectedFace[]>([]);
   const [selectedFaceIndex, setSelectedFaceIndex] = useState<number | null>(null);
+
+//   useEffect(() => {
+//     if (address) {
+//       setProfile(prev => ({ ...prev, name: address }));
+//     }
+//   }, [address]);
 
   useEffect(() => {
     const loadModels = async () => {
@@ -65,7 +76,7 @@ export default function FaceRegistration({ onFaceSaved, savedFaces }: Props) {
       setSelectedImage(imageUrl);
       setSelectedFaceIndex(null);
       setDetectedFaces([]);
-      setProfile({ name: '', linkedin: '', telegram: '' });
+      setProfile({ name: address ?? '', linkedin: '', telegram: '' });
     }
   };
 
@@ -139,7 +150,7 @@ export default function FaceRegistration({ onFaceSaved, savedFaces }: Props) {
 
     onFaceSaved([savedFace]);
     alert(`Saved face for ${profile.name}!`);
-    setProfile({ name: '', linkedin: '', telegram: '' });
+    setProfile({ name: address ?? '', linkedin: '', telegram: '' });
     setSelectedFaceIndex(null);
   };
 
@@ -208,7 +219,7 @@ export default function FaceRegistration({ onFaceSaved, savedFaces }: Props) {
                     type="text"
                     value={profile.name}
                     onChange={(e) => setProfile(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="Enter person's name"
+                    placeholder={address}
                     className="px-2 py-1 border rounded w-full"
                   />
                   <input
