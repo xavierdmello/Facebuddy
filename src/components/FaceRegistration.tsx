@@ -13,6 +13,7 @@ interface DetectedFace {
   detection: faceapi.FaceDetection;
   descriptor: Float32Array;
   isSelected?: boolean;
+  label: string;
 }
 
 interface Props {
@@ -53,6 +54,7 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
       setSelectedImage(imageUrl);
       setSelectedFaceIndex(null);
       setDetectedFaces([]);
+      setPersonName('');
     }
   };
 
@@ -73,12 +75,11 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
 
     const resizedDetections = faceapi.resizeResults(fullFaceDescriptions, displaySize);
 
-    setDetectedFaces(resizedDetections.map(({ detection, descriptor }) => ({
+    setDetectedFaces(resizedDetections.map(({ detection, descriptor }, index) => ({
       detection,
-      descriptor
+      descriptor,
+      label: `Face ${index + 1}`
     })));
-
-    drawFaces();
   };
 
   const drawFaces = () => {
@@ -88,10 +89,10 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
     if (ctx) {
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
-      detectedFaces.forEach(({ detection }, index) => {
+      detectedFaces.forEach(({ detection, label }, index) => {
         const isSelected = index === selectedFaceIndex;
         const drawBox = new faceapi.draw.DrawBox(detection.box, { 
-          label: `Face ${index + 1}`,
+          label: label,
           boxColor: isSelected ? '#00ff00' : '#ffd700'
         });
         drawBox.draw(canvasRef.current!);
@@ -101,7 +102,7 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
 
   useEffect(() => {
     drawFaces();
-  }, [selectedFaceIndex]);
+  }, [detectedFaces, selectedFaceIndex]);
 
   const saveFace = async () => {
     if (!imageRef.current || !isModelLoaded || !personName || selectedFaceIndex === null) {
@@ -112,6 +113,13 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
     const selectedFace = detectedFaces[selectedFaceIndex];
     if (!selectedFace) return;
 
+    const updatedFaces = detectedFaces.map((face, index) => 
+      index === selectedFaceIndex 
+        ? { ...face, label: personName }
+        : face
+    );
+    setDetectedFaces(updatedFaces);
+
     const savedFace: SavedFace = {
       label: personName,
       descriptor: selectedFace.descriptor
@@ -121,7 +129,6 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
     alert(`Saved face for ${personName}!`);
     setPersonName('');
     setSelectedFaceIndex(null);
-    drawFaces();
   };
 
   return (
@@ -163,7 +170,7 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
             <div className="border rounded-lg p-4 bg-white">
               <h3 className="text-sm font-semibold mb-2">Select Face to Label</h3>
               <div className="flex flex-col gap-2">
-                {detectedFaces.map((_, index) => (
+                {detectedFaces.map((face, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedFaceIndex(index)}
@@ -173,7 +180,7 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
                         : 'bg-gray-100 hover:bg-gray-200'
                     }`}
                   >
-                    Face {index + 1}
+                    {face.label}
                   </button>
                 ))}
               </div>
@@ -211,7 +218,7 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
       {detectedFaces.length > 0 && (
         <p className="text-sm text-gray-600">
           {selectedFaceIndex !== null 
-            ? `Face ${selectedFaceIndex + 1} selected for labeling`
+            ? `${detectedFaces[selectedFaceIndex].label} selected for labeling`
             : 'Select a face from the list to label it'}
         </p>
       )}
