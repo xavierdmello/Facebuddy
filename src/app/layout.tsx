@@ -1,9 +1,9 @@
-import type { Metadata } from 'next';
-import { NEXT_PUBLIC_URL } from '../config';
-
 import './global.css';
 import '@coinbase/onchainkit/styles.css';
 import '@rainbow-me/rainbowkit/styles.css';
+
+import type { Metadata } from 'next';
+import { NEXT_PUBLIC_URL } from '../config';
 import dynamic from 'next/dynamic';
 
 const OnchainProviders = dynamic(
@@ -19,11 +19,11 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'Onchain App Template',
-  description: 'Built with OnchainKit',
+  title: 'FaceBuddy',
+  description: 'Connect and Pay with 1 Click',
   openGraph: {
-    title: 'Onchain App Template',
-    description: 'Built with OnchainKit',
+    title: 'FaceBuddy',
+    description: 'Connect and Pay with 1 Click',
     images: [`${NEXT_PUBLIC_URL}/vibes/vibes-19.png`],
   },
 };

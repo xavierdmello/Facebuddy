@@ -1,30 +1,35 @@
-'use client';
+"use client";
 
-import FaceRecognition from 'src/components/FaceRecognition';
-import FaceRegistration from 'src/components/FaceRegistration';
-import Footer from 'src/components/Footer';
-import LoginButton from '../components/LoginButton';
-import { ONCHAINKIT_LINK } from 'src/links';
-import OnchainkitSvg from 'src/svg/OnchainkitSvg';
-import { ProfileData } from 'src/components/FaceRegistration';
-import SignupButton from '../components/SignupButton';
-import TransactionWrapper from 'src/components/TransactionWrapper';
-import WalletWrapper from 'src/components/WalletWrapper';
-import { useAccount } from 'wagmi';
-import { useState } from 'react';
+import FaceRecognition from "src/components/FaceRecognition";
+import FaceRegistration from "src/components/FaceRegistration";
+import Footer from "src/components/Footer";
+import Image from 'next/image';
+import LoginButton from "../components/LoginButton";
+import { ONCHAINKIT_LINK } from "src/links";
+import OnchainkitSvg from "src/svg/OnchainkitSvg";
+import { ProfileData } from "src/components/FaceRegistration";
+import SignupButton from "../components/SignupButton";
+import TransactionWrapper from "src/components/TransactionWrapper";
+import WalletWrapper from "src/components/WalletWrapper";
+import { useAccount } from "wagmi";
+import { useState } from "react";
 
 export default function Page() {
   const { address } = useAccount();
-  const [savedFaces, setSavedFaces] = useState<Array<{
-    label: ProfileData;
-    descriptor: Float32Array;
-  }>>([]);
+  const [savedFaces, setSavedFaces] = useState<
+    Array<{
+      label: ProfileData;
+      descriptor: Float32Array;
+    }>
+  >([]);
 
-  const handleFaceSaved = (newFaces: Array<{
-    label: ProfileData;
-    descriptor: Float32Array;
-  }>) => {
-    setSavedFaces(prev => [...prev, ...newFaces]);
+  const handleFaceSaved = (
+    newFaces: Array<{
+      label: ProfileData;
+      descriptor: Float32Array;
+    }>
+  ) => {
+    setSavedFaces((prev) => [...prev, ...newFaces]);
   };
 
   return (
@@ -37,7 +42,13 @@ export default function Page() {
             target="_blank"
             rel="noreferrer"
           >
-            <OnchainkitSvg />
+            <Image
+              src="/facebuddy.svg"
+              alt="FaceBuddy Logo"
+              width={200}
+              height={30}
+              className="mb-2"
+            />
           </a>
           <div className="flex items-center gap-3">
             <SignupButton />
