@@ -24,9 +24,10 @@ interface DetectedFace {
 
 interface Props {
   onFaceSaved: (faces: SavedFace[]) => void;
+  savedFaces: SavedFace[];
 }
 
-export default function FaceRegistration({ onFaceSaved }: Props) {
+export default function FaceRegistration({ onFaceSaved, savedFaces }: Props) {
   const imageRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
