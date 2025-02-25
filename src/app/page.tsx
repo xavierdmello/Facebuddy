@@ -6,6 +6,7 @@ import Footer from 'src/components/Footer';
 import LoginButton from '../components/LoginButton';
 import { ONCHAINKIT_LINK } from 'src/links';
 import OnchainkitSvg from 'src/svg/OnchainkitSvg';
+import { ProfileData } from 'src/components/FaceRegistration';
 import SignupButton from '../components/SignupButton';
 import TransactionWrapper from 'src/components/TransactionWrapper';
 import WalletWrapper from 'src/components/WalletWrapper';
@@ -14,9 +15,15 @@ import { useState } from 'react';
 
 export default function Page() {
   const { address } = useAccount();
-  const [savedFaces, setSavedFaces] = useState<Array<{ label: string; descriptor: Float32Array }>>([]);
+  const [savedFaces, setSavedFaces] = useState<Array<{
+    label: ProfileData;
+    descriptor: Float32Array;
+  }>>([]);
 
-  const handleFaceSaved = (newFaces: Array<{ label: string; descriptor: Float32Array }>) => {
+  const handleFaceSaved = (newFaces: Array<{
+    label: ProfileData;
+    descriptor: Float32Array;
+  }>) => {
     setSavedFaces(prev => [...prev, ...newFaces]);
   };
 
