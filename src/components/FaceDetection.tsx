@@ -9,6 +9,8 @@ export default function FaceDetection() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
+  const [faceMatcher, setFaceMatcher] = useState<faceapi.FaceMatcher | null>(null);
+  const [personName, setPersonName] = useState<string>('');
 
   useEffect(() => {
     const loadModels = async () => {
@@ -17,6 +19,7 @@ export default function FaceDetection() {
         await Promise.all([
           faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
           faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+          faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
         ]);
         setIsModelLoaded(true);
       } catch (error) {
@@ -38,48 +41,106 @@ export default function FaceDetection() {
   const detectFaces = async () => {
     if (!imageRef.current || !canvasRef.current || !isModelLoaded) return;
 
-    // Match canvas dimensions to displayed image size
     const displaySize = {
       width: imageRef.current.clientWidth,
       height: imageRef.current.clientHeight
     };
 
-    // Set canvas size to match the display size
     faceapi.matchDimensions(canvasRef.current, displaySize);
 
-    // Detect faces
-    const detections = await faceapi
+    const fullFaceDescriptions = await faceapi
       .detectAllFaces(imageRef.current, new faceapi.TinyFaceDetectorOptions())
-      .withFaceLandmarks();
+      .withFaceLandmarks()
+      .withFaceDescriptors();
 
-    // Resize the detections to match display size
-    const resizedDetections = faceapi.resizeResults(detections, displaySize);
+    if (!fullFaceDescriptions.length) {
+      console.log('No faces detected');
+      return;
+    }
 
-    console.log(resizedDetections)
-    // Clear previous drawings
+    if (!faceMatcher) {
+      const labeledDescriptors = fullFaceDescriptions.map((fd, i) => {
+        return new faceapi.LabeledFaceDescriptors(
+          personName || `Person ${i + 1}`,
+          [fd.descriptor]
+        );
+      });
+      setFaceMatcher(new faceapi.FaceMatcher(labeledDescriptors));
+    }
+
+    const resizedDetections = faceapi.resizeResults(fullFaceDescriptions, displaySize);
+
     const ctx = canvasRef.current.getContext('2d');
     if (ctx) {
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-      
-      // Draw each detection
-      resizedDetections.forEach(detection => {
-        const drawBox = new faceapi.draw.DrawBox(detection.detection.box, { 
-          label: 'Face',
-          boxColor: '#00ff00' // Make the box more visible
+
+      resizedDetections.forEach(({ detection, descriptor }) => {
+        let label = 'Unknown';
+        if (faceMatcher) {
+          const match = faceMatcher.findBestMatch(descriptor);
+          label = `${match.label} (${Math.round(100 - match.distance * 100)}%)`;
+        }
+
+        const drawBox = new faceapi.draw.DrawBox(detection.box, { 
+          label,
+          boxColor: '#00ff00',
+          drawLabelOptions: {
+            fontSize: 20,
+            fontStyle: 'bold'
+          }
         });
         drawBox.draw(canvasRef.current!);
       });
     }
   };
 
+  const saveAsReference = async () => {
+    if (!imageRef.current || !isModelLoaded) return;
+
+    const fullFaceDescriptions = await faceapi
+      .detectAllFaces(imageRef.current, new faceapi.TinyFaceDetectorOptions())
+      .withFaceLandmarks()
+      .withFaceDescriptors();
+
+    if (!fullFaceDescriptions.length) {
+      alert('No faces detected to save!');
+      return;
+    }
+
+    const labeledDescriptors = fullFaceDescriptions.map(fd => {
+      return new faceapi.LabeledFaceDescriptors(
+        personName || 'Unknown Person',
+        [fd.descriptor]
+      );
+    });
+
+    setFaceMatcher(new faceapi.FaceMatcher(labeledDescriptors));
+    alert('Reference face saved!');
+  };
+
   return (
     <div className="flex flex-col items-center gap-4">
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleImageUpload}
-        className="mb-4"
-      />
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={personName}
+          onChange={(e) => setPersonName(e.target.value)}
+          placeholder="Enter person's name"
+          className="px-2 py-1 border rounded"
+        />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageUpload}
+          className="mb-4"
+        />
+        <button
+          onClick={saveAsReference}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Save as Reference
+        </button>
+      </div>
       
       <div className="relative inline-block">
         {selectedImage && (
