@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import * as faceapi from 'face-api.js';
+import * as faceapi from "face-api.js";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 import { useAccount } from "wagmi";
 
@@ -30,30 +30,32 @@ interface Props {
 }
 
 export default function FaceRegistration({ onFaceSaved, savedFaces }: Props) {
-    const { address } = useAccount();
+  const { address } = useAccount();
 
   const imageRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [profile, setProfile] = useState<ProfileData>({
-    name: address ?? '',
-    linkedin: '',
-    telegram: ''
+    name: address ?? "",
+    linkedin: "",
+    telegram: "",
   });
-  
-  const [detectedFaces, setDetectedFaces] = useState<DetectedFace[]>([]);
-  const [selectedFaceIndex, setSelectedFaceIndex] = useState<number | null>(null);
 
-//   useEffect(() => {
-//     if (address) {
-//       setProfile(prev => ({ ...prev, name: address }));
-//     }
-//   }, [address]);
+  const [detectedFaces, setDetectedFaces] = useState<DetectedFace[]>([]);
+  const [selectedFaceIndex, setSelectedFaceIndex] = useState<number | null>(
+    null
+  );
+
+  //   useEffect(() => {
+  //     if (address) {
+  //       setProfile(prev => ({ ...prev, name: address }));
+  //     }
+  //   }, [address]);
 
   useEffect(() => {
     const loadModels = async () => {
-      const MODEL_URL = '/models';
+      const MODEL_URL = "/models";
       try {
         await Promise.all([
           faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
@@ -62,7 +64,7 @@ export default function FaceRegistration({ onFaceSaved, savedFaces }: Props) {
         ]);
         setIsModelLoaded(true);
       } catch (error) {
-        console.error('Error loading models:', error);
+        console.error("Error loading models:", error);
       }
     };
 
@@ -76,7 +78,7 @@ export default function FaceRegistration({ onFaceSaved, savedFaces }: Props) {
       setSelectedImage(imageUrl);
       setSelectedFaceIndex(null);
       setDetectedFaces([]);
-      setProfile({ name: address ?? '', linkedin: '', telegram: '' });
+      setProfile({ name: address ?? "", linkedin: "", telegram: "" });
     }
   };
 
@@ -85,7 +87,7 @@ export default function FaceRegistration({ onFaceSaved, savedFaces }: Props) {
 
     const displaySize = {
       width: imageRef.current.clientWidth,
-      height: imageRef.current.clientHeight
+      height: imageRef.current.clientHeight,
     };
 
     faceapi.matchDimensions(canvasRef.current, displaySize);
@@ -95,28 +97,33 @@ export default function FaceRegistration({ onFaceSaved, savedFaces }: Props) {
       .withFaceLandmarks()
       .withFaceDescriptors();
 
-    const resizedDetections = faceapi.resizeResults(fullFaceDescriptions, displaySize);
+    const resizedDetections = faceapi.resizeResults(
+      fullFaceDescriptions,
+      displaySize
+    );
 
-    setDetectedFaces(resizedDetections.map(({ detection, descriptor }, index) => ({
-      detection,
-      descriptor,
-      label: { name: `Face ${index + 1}`, linkedin: '', telegram: '' }
-    })));
+    setDetectedFaces(
+      resizedDetections.map(({ detection, descriptor }, index) => ({
+        detection,
+        descriptor,
+        label: { name: `Face ${index + 1}`, linkedin: "", telegram: "" },
+      }))
+    );
   };
 
   const drawFaces = () => {
     if (!canvasRef.current || !detectedFaces.length) return;
 
-    const ctx = canvasRef.current.getContext('2d');
+    const ctx = canvasRef.current.getContext("2d");
     if (ctx) {
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
       detectedFaces.forEach(({ detection, label }, index) => {
         const isSelected = index === selectedFaceIndex;
-        const displayLabel = typeof label === 'string' ? label : label.name;
-        const drawBox = new faceapi.draw.DrawBox(detection.box, { 
+        const displayLabel = typeof label === "string" ? label : label.name;
+        const drawBox = new faceapi.draw.DrawBox(detection.box, {
           label: displayLabel,
-          boxColor: isSelected ? '#00ff00' : '#ffd700'
+          boxColor: isSelected ? "#00ff00" : "#ffd700",
         });
         drawBox.draw(canvasRef.current!);
       });
@@ -128,46 +135,50 @@ export default function FaceRegistration({ onFaceSaved, savedFaces }: Props) {
   }, [detectedFaces, selectedFaceIndex]);
 
   const saveFace = async () => {
-    if (!imageRef.current || !isModelLoaded || !profile.name || selectedFaceIndex === null) {
-      alert('Please enter at least a name and select a face');
+    if (
+      !imageRef.current ||
+      !isModelLoaded ||
+      !profile.name ||
+      selectedFaceIndex === null
+    ) {
+      alert("Please enter at least a name and select a face");
       return;
     }
 
     const selectedFace = detectedFaces[selectedFaceIndex];
     if (!selectedFace) return;
 
-    const updatedFaces = detectedFaces.map((face, index) => 
-      index === selectedFaceIndex 
-        ? { ...face, label: profile }
-        : face
+    const updatedFaces = detectedFaces.map((face, index) =>
+      index === selectedFaceIndex ? { ...face, label: profile } : face
     );
     setDetectedFaces(updatedFaces);
 
     const savedFace: SavedFace = {
       label: profile,
-      descriptor: selectedFace.descriptor
+      descriptor: selectedFace.descriptor,
     };
 
     onFaceSaved([savedFace]);
     alert(`Saved face for ${profile.name}!`);
-    setProfile({ name: address ?? '', linkedin: '', telegram: '' });
+    setProfile({ name: address ?? "", linkedin: "", telegram: "" });
     setSelectedFaceIndex(null);
   };
 
   return (
     <div className="flex flex-col items-center gap-4 w-full">
       <h2 className="text-xl font-bold">Profile</h2>
-      
-      <div className="flex flex-col md:flex-row w-full max-w-[900px] gap-4">
+      <h2 className="text-l">Register by Taking a Picture of Yourself!</h2>
+
+      <div className="flex flex-col md:flex-row w-full max-w-[900px] gap-4 ">
         {/* Left/Top side: Image upload and preview */}
         <div className="flex-1 w-full md:w-auto">
-          <input
+        <input
             type="file"
             accept="image/*"
             onChange={handleImageUpload}
             className="mb-4 w-full"
           />
-          
+
           <div className="relative inline-block w-full">
             {selectedImage && (
               <>
@@ -191,7 +202,9 @@ export default function FaceRegistration({ onFaceSaved, savedFaces }: Props) {
         {detectedFaces.length > 0 && (
           <div className="flex flex-col gap-4 w-full md:w-[300px]">
             <div className="border rounded-lg p-4 bg-white">
-              <h3 className="text-sm font-semibold mb-2">Select Face to Label</h3>
+              <h3 className="text-sm font-semibold mb-2">
+                Select Face to Label
+              </h3>
               <div className="flex flex-col gap-2">
                 {detectedFaces.map((face, index) => (
                   <button
@@ -199,12 +212,12 @@ export default function FaceRegistration({ onFaceSaved, savedFaces }: Props) {
                     onClick={() => setSelectedFaceIndex(index)}
                     className={`px-3 py-2 rounded text-left ${
                       selectedFaceIndex === index
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-100 hover:bg-gray-200'
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-100 hover:bg-gray-200"
                     }`}
                   >
-                    {typeof face.label === 'string' 
-                      ? face.label 
+                    {typeof face.label === "string"
+                      ? face.label
                       : face.label.name}
                   </button>
                 ))}
@@ -213,26 +226,40 @@ export default function FaceRegistration({ onFaceSaved, savedFaces }: Props) {
 
             {selectedFaceIndex !== null && (
               <div className="border rounded-lg p-4 bg-white">
-                <h3 className="text-sm font-semibold mb-2">Label Selected Face</h3>
+                <h3 className="text-sm font-semibold mb-2">
+                  Label Selected Face
+                </h3>
                 <div className="flex flex-col gap-2">
                   <input
                     type="text"
                     value={profile.name}
-                    onChange={(e) => setProfile(prev => ({ ...prev, name: e.target.value }))}
+                    onChange={(e) =>
+                      setProfile((prev) => ({ ...prev, name: e.target.value }))
+                    }
                     placeholder={address}
                     className="px-2 py-1 border rounded w-full"
                   />
                   <input
                     type="text"
-                    value={profile.linkedin || ''}
-                    onChange={(e) => setProfile(prev => ({ ...prev, linkedin: e.target.value }))}
+                    value={profile.linkedin || ""}
+                    onChange={(e) =>
+                      setProfile((prev) => ({
+                        ...prev,
+                        linkedin: e.target.value,
+                      }))
+                    }
                     placeholder="LinkedIn username (optional)"
                     className="px-2 py-1 border rounded w-full"
                   />
                   <input
                     type="text"
-                    value={profile.telegram || ''}
-                    onChange={(e) => setProfile(prev => ({ ...prev, telegram: e.target.value }))}
+                    value={profile.telegram || ""}
+                    onChange={(e) =>
+                      setProfile((prev) => ({
+                        ...prev,
+                        telegram: e.target.value,
+                      }))
+                    }
                     placeholder="Telegram username (optional)"
                     className="px-2 py-1 border rounded w-full"
                   />
@@ -241,8 +268,8 @@ export default function FaceRegistration({ onFaceSaved, savedFaces }: Props) {
                     disabled={!profile.name}
                     className={`px-4 py-2 rounded w-full ${
                       !profile.name
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-blue-500 hover:bg-blue-600'
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-500 hover:bg-blue-600"
                     } text-white`}
                   >
                     Save Face
@@ -253,16 +280,18 @@ export default function FaceRegistration({ onFaceSaved, savedFaces }: Props) {
           </div>
         )}
       </div>
-      
+
       {detectedFaces.length > 0 && (
         <p className="text-sm text-gray-600">
-          {selectedFaceIndex !== null 
-            ? `${typeof detectedFaces[selectedFaceIndex].label === 'string' 
-                ? detectedFaces[selectedFaceIndex].label 
-                : detectedFaces[selectedFaceIndex].label.name} selected for labeling`
-            : 'Select a face from the list to label it'}
+          {selectedFaceIndex !== null
+            ? `${
+                typeof detectedFaces[selectedFaceIndex].label === "string"
+                  ? detectedFaces[selectedFaceIndex].label
+                  : detectedFaces[selectedFaceIndex].label.name
+              } selected for labeling`
+            : "Select a face from the list to label it"}
         </p>
       )}
     </div>
   );
-} 
+}

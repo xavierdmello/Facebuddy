@@ -136,8 +136,9 @@ export default function FaceRecognition({ savedFaces }: Props) {
 
   return (
     <div className="flex flex-col items-center gap-4 w-full">
-      <h2 className="text-xl font-bold">Recognize Faces</h2>
-      
+      <h2 className="text-xl font-bold">Connect by Face</h2>
+      <h2 className="text-l">Take a Picture to Pay or Connect!</h2>
+
       <div className="flex flex-col md:flex-row w-full max-w-[900px] gap-4">
         {/* Left/Top side: Image upload and preview */}
         <div className="flex-1 w-full md:w-auto">
