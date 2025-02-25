@@ -144,7 +144,7 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <h2 className="text-xl font-bold">Register New Face</h2>
+      <h2 className="text-xl font-bold">Profile</h2>
       
       <div className="flex w-full max-w-[450px] gap-4">
         {/* Left side: Image upload and preview */}
