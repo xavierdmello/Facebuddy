@@ -3,7 +3,7 @@
 import FaceRecognition from "src/components/FaceRecognition";
 import FaceRegistration from "src/components/FaceRegistration";
 import Footer from "src/components/Footer";
-import Image from 'next/image';
+import Image from "next/image";
 import LoginButton from "../components/LoginButton";
 import { ONCHAINKIT_LINK } from "src/links";
 import OnchainkitSvg from "src/svg/OnchainkitSvg";
@@ -16,7 +16,9 @@ import { useState } from "react";
 
 export default function Page() {
   const { address } = useAccount();
-  const [activeView, setActiveView] = useState<'recognize' | 'register'>('recognize');
+  const [activeView, setActiveView] = useState<"recognize" | "register">(
+    "recognize"
+  );
   const [savedFaces, setSavedFaces] = useState<
     Array<{
       label: ProfileData;
@@ -67,12 +69,17 @@ export default function Page() {
         </div> */}
         {address ? (
           <>
-            {activeView === 'register' ? (
-              <FaceRegistration onFaceSaved={handleFaceSaved} savedFaces={savedFaces} />
+            {activeView === "register" ? (
+              <FaceRegistration
+                onFaceSaved={handleFaceSaved}
+                savedFaces={savedFaces}
+              />
             ) : (
-              <FaceRecognition savedFaces={savedFaces} />
+              <>
+                <FaceRecognition savedFaces={savedFaces} />
+                <TransactionWrapper address={address} />
+              </>
             )}
-            <TransactionWrapper address={address} />
           </>
         ) : (
           <WalletWrapper
@@ -85,9 +92,9 @@ export default function Page() {
       <section className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
         <div className="max-w-[900px] mx-auto flex justify-around items-center h-16">
           <button
-            onClick={() => setActiveView('recognize')}
+            onClick={() => setActiveView("recognize")}
             className={`flex flex-col items-center justify-center w-full h-full ${
-              activeView === 'recognize' ? 'text-blue-500' : 'text-gray-500'
+              activeView === "recognize" ? "text-blue-500" : "text-gray-500"
             }`}
           >
             <svg
@@ -108,9 +115,9 @@ export default function Page() {
           </button>
 
           <button
-            onClick={() => setActiveView('register')}
+            onClick={() => setActiveView("register")}
             className={`flex flex-col items-center justify-center w-full h-full ${
-              activeView === 'register' ? 'text-blue-500' : 'text-gray-500'
+              activeView === "register" ? "text-blue-500" : "text-gray-500"
             }`}
           >
             <svg
