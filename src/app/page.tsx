@@ -1,6 +1,5 @@
 'use client';
 
-import FaceDetection from 'src/components/FaceDetection';
 import FaceRecognition from 'src/components/FaceRecognition';
 import FaceRegistration from 'src/components/FaceRegistration';
 import Footer from 'src/components/Footer';
