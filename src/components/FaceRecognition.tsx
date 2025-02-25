@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { ProfileData } from './FaceRegistration';
 
-interface SavedFace {
+export interface SavedFace {
   label: ProfileData;
   descriptor: Float32Array;
 }

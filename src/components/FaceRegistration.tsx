@@ -88,7 +88,7 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
     setDetectedFaces(resizedDetections.map(({ detection, descriptor }, index) => ({
       detection,
       descriptor,
-      label: `Face ${index + 1}`
+      label: { name: `Face ${index + 1}`, linkedin: '', telegram: '' }
     })));
   };
 
