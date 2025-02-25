@@ -4,8 +4,14 @@ import * as faceapi from 'face-api.js';
 
 import { useEffect, useRef, useState } from 'react';
 
+export interface ProfileData {
+  name: string;
+  linkedin?: string;
+  telegram?: string;
+}
+
 interface SavedFace {
-  label: string;
+  label: ProfileData;
   descriptor: Float32Array;
 }
 
@@ -13,7 +19,7 @@ interface DetectedFace {
   detection: faceapi.FaceDetection;
   descriptor: Float32Array;
   isSelected?: boolean;
-  label: string;
+  label: ProfileData;
 }
 
 interface Props {
@@ -25,7 +31,11 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
-  const [personName, setPersonName] = useState<string>('');
+  const [profile, setProfile] = useState<ProfileData>({
+    name: '',
+    linkedin: '',
+    telegram: ''
+  });
   const [detectedFaces, setDetectedFaces] = useState<DetectedFace[]>([]);
   const [selectedFaceIndex, setSelectedFaceIndex] = useState<number | null>(null);
 
@@ -54,7 +64,7 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
       setSelectedImage(imageUrl);
       setSelectedFaceIndex(null);
       setDetectedFaces([]);
-      setPersonName('');
+      setProfile({ name: '', linkedin: '', telegram: '' });
     }
   };
 
@@ -91,8 +101,9 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
 
       detectedFaces.forEach(({ detection, label }, index) => {
         const isSelected = index === selectedFaceIndex;
+        const displayLabel = typeof label === 'string' ? label : label.name;
         const drawBox = new faceapi.draw.DrawBox(detection.box, { 
-          label: label,
+          label: displayLabel,
           boxColor: isSelected ? '#00ff00' : '#ffd700'
         });
         drawBox.draw(canvasRef.current!);
@@ -105,8 +116,8 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
   }, [detectedFaces, selectedFaceIndex]);
 
   const saveFace = async () => {
-    if (!imageRef.current || !isModelLoaded || !personName || selectedFaceIndex === null) {
-      alert('Please enter a name and select a face');
+    if (!imageRef.current || !isModelLoaded || !profile.name || selectedFaceIndex === null) {
+      alert('Please enter at least a name and select a face');
       return;
     }
 
@@ -115,19 +126,19 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
 
     const updatedFaces = detectedFaces.map((face, index) => 
       index === selectedFaceIndex 
-        ? { ...face, label: personName }
+        ? { ...face, label: profile }
         : face
     );
     setDetectedFaces(updatedFaces);
 
     const savedFace: SavedFace = {
-      label: personName,
+      label: profile,
       descriptor: selectedFace.descriptor
     };
 
     onFaceSaved([savedFace]);
-    alert(`Saved face for ${personName}!`);
-    setPersonName('');
+    alert(`Saved face for ${profile.name}!`);
+    setProfile({ name: '', linkedin: '', telegram: '' });
     setSelectedFaceIndex(null);
   };
 
@@ -180,7 +191,9 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
                         : 'bg-gray-100 hover:bg-gray-200'
                     }`}
                   >
-                    {face.label}
+                    {typeof face.label === 'string' 
+                      ? face.label 
+                      : face.label.name}
                   </button>
                 ))}
               </div>
@@ -192,16 +205,30 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
                 <div className="flex flex-col gap-2">
                   <input
                     type="text"
-                    value={personName}
-                    onChange={(e) => setPersonName(e.target.value)}
+                    value={profile.name}
+                    onChange={(e) => setProfile(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="Enter person's name"
+                    className="px-2 py-1 border rounded"
+                  />
+                  <input
+                    type="text"
+                    value={profile.linkedin || ''}
+                    onChange={(e) => setProfile(prev => ({ ...prev, linkedin: e.target.value }))}
+                    placeholder="LinkedIn username (optional)"
+                    className="px-2 py-1 border rounded"
+                  />
+                  <input
+                    type="text"
+                    value={profile.telegram || ''}
+                    onChange={(e) => setProfile(prev => ({ ...prev, telegram: e.target.value }))}
+                    placeholder="Telegram username (optional)"
                     className="px-2 py-1 border rounded"
                   />
                   <button
                     onClick={saveFace}
-                    disabled={!personName}
+                    disabled={!profile.name}
                     className={`px-4 py-2 rounded ${
-                      !personName
+                      !profile.name
                         ? 'bg-gray-400 cursor-not-allowed'
                         : 'bg-blue-500 hover:bg-blue-600'
                     } text-white`}
@@ -218,7 +245,9 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
       {detectedFaces.length > 0 && (
         <p className="text-sm text-gray-600">
           {selectedFaceIndex !== null 
-            ? `${detectedFaces[selectedFaceIndex].label} selected for labeling`
+            ? `${typeof detectedFaces[selectedFaceIndex].label === 'string' 
+                ? detectedFaces[selectedFaceIndex].label 
+                : detectedFaces[selectedFaceIndex].label.name} selected for labeling`
             : 'Select a face from the list to label it'}
         </p>
       )}

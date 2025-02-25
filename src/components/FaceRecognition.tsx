@@ -4,8 +4,10 @@ import * as faceapi from 'face-api.js';
 
 import { useEffect, useRef, useState } from 'react';
 
+import { ProfileData } from './FaceRegistration';
+
 interface SavedFace {
-  label: string;
+  label: ProfileData;
   descriptor: Float32Array;
 }
 
@@ -41,11 +43,11 @@ export default function FaceRecognition({ savedFaces }: Props) {
   useEffect(() => {
     if (savedFaces.length > 0) {
       const labeledDescriptors = savedFaces.reduce((acc: faceapi.LabeledFaceDescriptors[], face) => {
-        const existing = acc.find(ld => ld.label === face.label);
+        const existing = acc.find(ld => ld.label === face.label.name);
         if (existing) {
           existing.descriptors.push(face.descriptor);
         } else {
-          acc.push(new faceapi.LabeledFaceDescriptors(face.label, [face.descriptor]));
+          acc.push(new faceapi.LabeledFaceDescriptors(face.label.name, [face.descriptor]));
         }
         return acc;
       }, []);
@@ -85,7 +87,17 @@ export default function FaceRecognition({ savedFaces }: Props) {
 
       resizedDetections.forEach(({ detection, descriptor }) => {
         const match = faceMatcher.current!.findBestMatch(descriptor);
-        const label = `${match.label} (${Math.round(100 - match.distance * 100)}%)`;
+        const matchedFace = savedFaces.find(face => face.label.name === match.label);
+        let label = `${match.label} (${Math.round(100 - match.distance * 100)}%)`;
+        
+        if (matchedFace) {
+          const socialLinks = [];
+          if (matchedFace.label.linkedin) socialLinks.push(`LinkedIn: ${matchedFace.label.linkedin}`);
+          if (matchedFace.label.telegram) socialLinks.push(`Telegram: ${matchedFace.label.telegram}`);
+          if (socialLinks.length > 0) {
+            label += `\n${socialLinks.join(' | ')}`;
+          }
+        }
         
         const drawBox = new faceapi.draw.DrawBox(detection.box, { 
           label,
