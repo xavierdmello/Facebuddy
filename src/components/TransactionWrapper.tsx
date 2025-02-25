@@ -1,4 +1,11 @@
 'use client';
+
+import type { Address, ContractFunctionParameters } from 'viem';
+import {
+  BASE_SEPOLIA_CHAIN_ID,
+  mintABI,
+  mintContractAddress,
+} from '../constants';
 import {
   Transaction,
   TransactionButton,
@@ -10,12 +17,6 @@ import type {
   TransactionError,
   TransactionResponse,
 } from '@coinbase/onchainkit/transaction';
-import type { Address, ContractFunctionParameters } from 'viem';
-import {
-  BASE_SEPOLIA_CHAIN_ID,
-  mintABI,
-  mintContractAddress,
-} from '../constants';
 
 export default function TransactionWrapper({ address }: { address: Address }) {
   const contracts = [
@@ -36,10 +37,10 @@ export default function TransactionWrapper({ address }: { address: Address }) {
   };
 
   return (
-    <div className="flex w-[450px]">
+    <div className="flex w-full max-w-full">
       <Transaction
         contracts={contracts}
-        className="w-[450px]"
+        className="mb-4 w-full max-w-full"
         chainId={BASE_SEPOLIA_CHAIN_ID}
         onError={handleError}
         onSuccess={handleSuccess}

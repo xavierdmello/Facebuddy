@@ -145,22 +145,22 @@ export default function FaceRecognition({ savedFaces }: Props) {
             type="file"
             accept="image/*"
             onChange={handleImageUpload}
-            className="mb-4 w-full"
+            className="mb-4 w-full max-w-full"
           />
           
-          <div className="relative inline-block w-full">
+          <div className="relative w-full">
             {selectedImage && (
               <>
                 <img
                   ref={imageRef}
                   src={selectedImage}
                   alt="Selected"
-                  className="w-full md:max-w-[450px] rounded-xl"
+                  className="w-full max-w-full md:max-w-[450px] rounded-xl"
                   onLoad={detectFaces}
                 />
                 <canvas
                   ref={canvasRef}
-                  className="absolute top-0 left-0 z-10"
+                  className="absolute top-0 left-0 z-10 w-full h-full"
                 />
               </>
             )}
