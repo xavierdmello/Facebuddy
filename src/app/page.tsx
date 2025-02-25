@@ -1,6 +1,8 @@
 'use client';
 
 import FaceDetection from 'src/components/FaceDetection';
+import FaceRecognition from 'src/components/FaceRecognition';
+import FaceRegistration from 'src/components/FaceRegistration';
 import Footer from 'src/components/Footer';
 import LoginButton from '../components/LoginButton';
 import { ONCHAINKIT_LINK } from 'src/links';
@@ -9,9 +11,15 @@ import SignupButton from '../components/SignupButton';
 import TransactionWrapper from 'src/components/TransactionWrapper';
 import WalletWrapper from 'src/components/WalletWrapper';
 import { useAccount } from 'wagmi';
+import { useState } from 'react';
 
 export default function Page() {
   const { address } = useAccount();
+  const [savedFaces, setSavedFaces] = useState<Array<{ label: string; descriptor: Float32Array }>>([]);
+
+  const handleFaceSaved = (newFaces: Array<{ label: string; descriptor: Float32Array }>) => {
+    setSavedFaces(prev => [...prev, ...newFaces]);
+  };
 
   return (
     <div className="flex h-full w-96 max-w-full flex-col px-1 md:w-[1008px]">
@@ -41,8 +49,9 @@ export default function Page() {
         </div> */}
         {address ? (
           <>
-            <FaceDetection />
-            {/* <TransactionWrapper address={address} /> */}
+            <FaceRegistration onFaceSaved={handleFaceSaved} />
+            <FaceRecognition savedFaces={savedFaces} />
+            <TransactionWrapper address={address} />
           </>
         ) : (
           <WalletWrapper
