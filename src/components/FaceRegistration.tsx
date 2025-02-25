@@ -143,27 +143,27 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-4 w-full">
       <h2 className="text-xl font-bold">Profile</h2>
       
-      <div className="flex w-full max-w-[450px] gap-4">
-        {/* Left side: Image upload and preview */}
-        <div className="flex-1">
+      <div className="flex flex-col md:flex-row w-full max-w-[900px] gap-4">
+        {/* Left/Top side: Image upload and preview */}
+        <div className="flex-1 w-full md:w-auto">
           <input
             type="file"
             accept="image/*"
             onChange={handleImageUpload}
-            className="mb-4"
+            className="mb-4 w-full"
           />
           
-          <div className="relative inline-block">
+          <div className="relative inline-block w-full">
             {selectedImage && (
               <>
                 <img
                   ref={imageRef}
                   src={selectedImage}
                   alt="Selected"
-                  className="max-w-[450px] rounded-xl"
+                  className="w-full md:max-w-[450px] rounded-xl"
                   onLoad={detectFaces}
                 />
                 <canvas
@@ -175,9 +175,9 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
           </div>
         </div>
 
-        {/* Right side: Face selection and labeling */}
+        {/* Right/Bottom side: Face selection and labeling */}
         {detectedFaces.length > 0 && (
-          <div className="flex flex-col gap-4 min-w-[200px]">
+          <div className="flex flex-col gap-4 w-full md:w-[300px]">
             <div className="border rounded-lg p-4 bg-white">
               <h3 className="text-sm font-semibold mb-2">Select Face to Label</h3>
               <div className="flex flex-col gap-2">
@@ -208,26 +208,26 @@ export default function FaceRegistration({ onFaceSaved }: Props) {
                     value={profile.name}
                     onChange={(e) => setProfile(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="Enter person's name"
-                    className="px-2 py-1 border rounded"
+                    className="px-2 py-1 border rounded w-full"
                   />
                   <input
                     type="text"
                     value={profile.linkedin || ''}
                     onChange={(e) => setProfile(prev => ({ ...prev, linkedin: e.target.value }))}
                     placeholder="LinkedIn username (optional)"
-                    className="px-2 py-1 border rounded"
+                    className="px-2 py-1 border rounded w-full"
                   />
                   <input
                     type="text"
                     value={profile.telegram || ''}
                     onChange={(e) => setProfile(prev => ({ ...prev, telegram: e.target.value }))}
                     placeholder="Telegram username (optional)"
-                    className="px-2 py-1 border rounded"
+                    className="px-2 py-1 border rounded w-full"
                   />
                   <button
                     onClick={saveFace}
                     disabled={!profile.name}
-                    className={`px-4 py-2 rounded ${
+                    className={`px-4 py-2 rounded w-full ${
                       !profile.name
                         ? 'bg-gray-400 cursor-not-allowed'
                         : 'bg-blue-500 hover:bg-blue-600'
