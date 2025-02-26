@@ -102,13 +102,18 @@ export default function FaceRegistration({ onFaceSaved, savedFaces }: Props) {
       displaySize
     );
 
-    setDetectedFaces(
-      resizedDetections.map(({ detection, descriptor }, index) => ({
-        detection,
-        descriptor,
-        label: { name: `Face ${index + 1}`, linkedin: "", telegram: "" },
-      }))
-    );
+    const detectedFacesData = resizedDetections.map(({ detection, descriptor }, index) => ({
+      detection,
+      descriptor,
+      label: index === 0 ? profile : { name: `Face ${index + 1}`, linkedin: "", telegram: "" },
+    }));
+
+    setDetectedFaces(detectedFacesData);
+    
+    // Auto-select the first face if any faces are detected
+    if (detectedFacesData.length > 0) {
+      setSelectedFaceIndex(0);
+    }
   };
 
   const drawFaces = () => {
