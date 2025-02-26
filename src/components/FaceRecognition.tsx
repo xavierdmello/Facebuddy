@@ -78,6 +78,8 @@ export default function FaceRecognition({ savedFaces }: Props) {
   const detectFaces = async () => {
     if (!imageRef.current || !canvasRef.current || !isModelLoaded || !faceMatcher.current) return;
 
+    // call api with image
+    
     const displaySize = {
       width: imageRef.current.clientWidth,
       height: imageRef.current.clientHeight
@@ -103,6 +105,8 @@ export default function FaceRecognition({ savedFaces }: Props) {
         matchedProfile: matchedFace?.label
       };
     });
+
+    // return faces
 
     setDetectedFaces(faces);
     drawFaces(faces);
