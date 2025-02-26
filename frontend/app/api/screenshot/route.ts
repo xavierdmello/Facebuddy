@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 // Target app name to screenshot
-const TARGET_APP_NAME = "Bezel";
+const TARGET_APP_NAME = "Chrome";
 
 export async function GET() {
   try {
