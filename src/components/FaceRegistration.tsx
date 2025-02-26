@@ -4,6 +4,7 @@ import * as faceapi from "face-api.js";
 
 import { useEffect, useRef, useState } from "react";
 
+import EthStorageUploader from "./EthStorageUploader";
 import { useAccount } from "wagmi";
 
 export interface ProfileData {
@@ -297,6 +298,9 @@ export default function FaceRegistration({ onFaceSaved, savedFaces }: Props) {
             : "Select a face from the list to label it"}
         </p>
       )}
+
+<EthStorageUploader />
+
     </div>
   );
 }
