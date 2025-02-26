@@ -78,8 +78,6 @@ export default function FaceRecognition({ savedFaces }: Props) {
   const detectFaces = async () => {
     if (!imageRef.current || !canvasRef.current || !isModelLoaded || !faceMatcher.current) return;
 
-    // call api with image
-    
     const displaySize = {
       width: imageRef.current.clientWidth,
       height: imageRef.current.clientHeight
@@ -106,7 +104,11 @@ export default function FaceRecognition({ savedFaces }: Props) {
       };
     });
 
-    // return faces
+    // Auto-select the first face that has a match and isn't unknown
+    const firstMatchIndex = faces.findIndex(face => face.match.label !== 'unknown');
+    if (firstMatchIndex !== -1) {
+      setSelectedFaceIndex(firstMatchIndex);
+    }
 
     setDetectedFaces(faces);
     drawFaces(faces);
